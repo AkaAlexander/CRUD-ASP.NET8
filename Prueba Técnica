@@ -1,0 +1,7 @@
+Nos gustaría que realizaras una aplicación web que muestre los usuarios de la siguiente API: https://jsonplaceholder.typicode.com/users
+Para ello (requisitos mínimos):
+Haz un programa en .NET que descargue los datos del endpoint anterior y lo guarde en una base de datos en la tabla correspondiente que crees.
+Haz una pequeña aplicación web (usando el framework que prefieras) en donde se muestre en la página principal el listado de usuarios con sus datos, siendo editable el nombre de usuario y, además, se puedan eliminar usuarios.
+Opcional:
+Convertir el programa de descarga de usuarios en un servicio que descargue cada 10 minutos (o el tiempo que tú prefieras) la información de los usuarios. Aunque la API devuelve siempre la misma información, nos interesa evaluar aquí la lógica del servicio.
+Las consultas a base de datos de selección, actualización o eliminación se harán usando EntityFramework no pegando las consultas directamente.

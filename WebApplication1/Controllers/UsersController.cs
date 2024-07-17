@@ -12,6 +12,11 @@ public class UsersController : ControllerBase
 	private readonly IApiService _apiService;
 	private readonly DbptContext _dbptContext;
 
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="apiService"></param>
+	/// <param name="dbptContext"></param>
 	public UsersController(IApiService apiService, DbptContext dbptContext)
 	{
 		_apiService = apiService;
@@ -25,54 +30,22 @@ public class UsersController : ControllerBase
 	[HttpGet("fetch-and-insert")]
 	public async Task<IActionResult> FetchAndInsertUsers()
 	{
-		string apiUrl = "https://jsonplaceholder.typicode.com/users"; // Reemplaza esto con la URL real de tu API
+		string apiUrl = "https://jsonplaceholder.typicode.com/users"; 
 		List<Usuario> users = await _apiService.FetchUsersFromApi(apiUrl);
 
-		// Aquí puedes llamar a otro servicio para insertar los usuarios en la base de datos
 		foreach (var user in users)
 		{
-			//if (_dbptContext.Usuarios.Find(user.Id) == null) // Evita duplicados
-			//{
-				Usuario usuario = new Usuario() 
-				{ 
-					Id = user.Id,
-					Name = user.Name,
-					Username = user.Name,
-					Email = user.Email,
-					Phone = user.Phone,
-					Website = user.Website
-				};
-
-				_dbptContext.Usuarios.Add(usuario);
-
-				if (user.Direccion != null)
-				{
-					user.Direccion.UserId = user.Id; 
-					user.Direccion.User = user;
-				}
-
-				if (user.Compania != null)
-				{
-					user.Compania.UserId = user.Id; 
-					user.Compania.User = user;
-				}
-
-
-				if (user.Direccion != null)
-				{
-					_dbptContext.Direccions.Add(user.Direccion);
-				}
-
-				if (user.Compania != null)
-				{
-					_dbptContext.Compania.Add(user.Compania);
-				}
-			//}
+			//Identifica usuarios con Id
+			if ( _dbptContext.Usuarios.Find(user.Id) == null) 
+			{ 
+				_dbptContext.Usuarios.Add(user);
+			}
 		}
 
+		//Añade a la BBDD
 		await _dbptContext.SaveChangesAsync();
 
-		return Ok(users); // O cualquier otra acción que desees realizar con los datos
+		return Ok(users); 
 	}
 }
 

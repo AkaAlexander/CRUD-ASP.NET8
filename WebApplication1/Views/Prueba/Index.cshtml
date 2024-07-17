@@ -1,0 +1,19 @@
+﻿@model List<MiTabla>
+
+<h1> Valores</h1>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Valores</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@Html.DisplayFor(v => item.Valor)</td>
+			</tr>
+		}
+	</tbody>
+</table>

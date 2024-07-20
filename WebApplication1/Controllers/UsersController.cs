@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
 	}
 
 	/// <summary>
-	/// Para llamar al metodo introducir la url 'https://localhost:5001/api/users/fetch-and-insert'
+	/// Para llamar al metodo introducir la url 'https://localhost:44353/api/users/fetch-and-insert'
 	/// </summary>
 	/// <returns></returns>
 	[HttpGet("fetch-and-insert")]
@@ -39,6 +39,27 @@ public class UsersController : ControllerBase
 			if ( _dbptContext.Usuarios.Find(user.Id) == null) 
 			{ 
 				_dbptContext.Usuarios.Add(user);
+			}
+
+			if (user.Direccion != null)
+			{
+				_dbptContext.Direccions.Add(user.Direccion);
+			}
+
+			if (user.Direccion.Geo != null)
+			{
+				//user.Direccion.Geo.DireccionId = user.Direccion.UserId;
+				//user.Direccion.Geo.Direccion = user.Direccion;
+
+				_dbptContext.Geos.Add(user.Direccion.Geo);
+			}
+
+			if (user.Compania != null)
+			{
+				//user.Compania.UserId = user.Id; // Establecer la relación
+				//user.Compania.User = user;
+
+				_dbptContext.Compania.Add(user.Compania);
 			}
 		}
 

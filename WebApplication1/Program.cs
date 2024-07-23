@@ -4,6 +4,13 @@ using WebApplication1.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configurar el serializador JSON
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+	options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+	options.JsonSerializerOptions.MaxDepth = 64; // Puedes ajustar la profundidad máxima si es necesario
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

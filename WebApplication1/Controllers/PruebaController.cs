@@ -15,7 +15,13 @@ namespace WebApplication1.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			return View(await _context.MiTablas.ToListAsync());
-		}
+            //List<Usuario> users = await _context.Usuarios.ToListAsync();
+			var users = await _context.Usuarios
+				.Include(x => x.Direccion)
+				.Include(x => x.Compania)
+				.Include(x => x.Direccion.Geo)
+				.ToListAsync();
+            return View(users);
+        }
 	}
 }

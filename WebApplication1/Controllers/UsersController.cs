@@ -7,19 +7,19 @@ using WebApplication1.Service;
 //[Route("api/[controller]")]
 public class UsersController : Controller
 {
-	private readonly IApiService _apiService;
-	private readonly DbptContext _context;
+    private readonly IApiService _apiService;
+    private readonly DbptContext _context;
 
-	/// <summary>
-	/// Constructor
-	/// </summary>
-	/// <param name="apiService"></param>
-	/// <param name="dbptContext"></param>
-	public UsersController(IApiService apiService, DbptContext context)
-	{
-		_apiService = apiService;
-		_context = context;
-	}
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="apiService"></param>
+    /// <param name="dbptContext"></param>
+    public UsersController(IApiService apiService, DbptContext context)
+    {
+        _apiService = apiService;
+        _context = context;
+    }
 
     [HttpGet]
     public async Task<IActionResult> Index()
@@ -37,49 +37,49 @@ public class UsersController : Controller
     /// </summary>
     /// <returns></returns>
     [HttpGet("fetch-and-insert")]
-	public async Task<IActionResult> FetchAndInsertUsers()
-	{
-		string apiUrl = "https://jsonplaceholder.typicode.com/users"; 
-		List<Usuario> users = await _apiService.FetchUsersFromApi(apiUrl);
+    public async Task<IActionResult> FetchAndInsertUsers()
+    {
+        string apiUrl = "https://jsonplaceholder.typicode.com/users";
+        List<Usuario> users = await _apiService.FetchUsersFromApi(apiUrl);
 
-		foreach (var user in users)
-		{
-			//Identifica usuarios con Id
-			if (_context.Usuarios.Find(user.Id) == null) 
-			{
+        foreach (var user in users)
+        {
+            //Identifica usuarios con Id
+            if (_context.Usuarios.Find(user.Id) == null)
+            {
                 _context.Usuarios.Add(user);
-			}
+            }
 
-			if (user.Direccion != null)
-			{
+            if (user.Direccion != null)
+            {
                 _context.Direccions.Add(user.Direccion);
-			}
+            }
 
-			if (user.Direccion.Geo != null)
-			{
+            if (user.Direccion.Geo != null)
+            {
                 //user.Direccion.Geo.DireccionId = user.Direccion.UserId;
                 //user.Direccion.Geo.Direccion = user.Direccion;
 
                 _context.Geos.Add(user.Direccion.Geo);
-			}
+            }
 
-			if (user.Compania != null)
-			{
+            if (user.Compania != null)
+            {
 
 
                 _context.Compania.Add(user.Compania);
-			}
-		}
+            }
+        }
 
-		//Añade a la BBDD
-		await _context.SaveChangesAsync();
+        //Añade a la BBDD
+        await _context.SaveChangesAsync();
 
-		return Ok(users);
+        return Ok(users);
     }
 
     [HttpGet]
     public async Task<IActionResult> Editar(int id)
-    { 
+    {
         Usuario usuario = await _context.Usuarios.FirstAsync(x => x.Id == id);
         return View(usuario);
     }
@@ -90,6 +90,43 @@ public class UsersController : Controller
         _context.Usuarios.Update(user);
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        using (var transaction = await _context.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                // Buscar el usuario
+                var user = await _context.Usuarios
+                    .Include(u => u.Direccion)
+                    .ThenInclude(d => d.Geo)
+                    .Include(u => u.Compania)
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                // Eliminar el usuario (esto también eliminará Direccion, Geo y Compania por la configuración de borrado en cascada)
+                _context.Usuarios.Remove(user);
+                await _context.SaveChangesAsync();
+
+                // Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                // Revertir la transacción en caso de error
+                await transaction.RollbackAsync();
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 
 }

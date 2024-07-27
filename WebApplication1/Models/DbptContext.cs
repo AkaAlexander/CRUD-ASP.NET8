@@ -42,7 +42,7 @@ public partial class DbptContext : DbContext
 
             entity.HasOne(d => d.User).WithOne(p => p.Compania)
                 .HasForeignKey<Compania>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Compania__UserId__5EBF139D");
         });
 
@@ -60,7 +60,7 @@ public partial class DbptContext : DbContext
 
             entity.HasOne(d => d.User).WithOne(p => p.Direccion)
                 .HasForeignKey<Direccion>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Direccion__UserI__59063A47");
         });
 
@@ -77,6 +77,7 @@ public partial class DbptContext : DbContext
             entity.HasOne(d => d.Direccion).WithOne(p => p.Geo)
                 .HasForeignKey<Geo>(d => d.DireccionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade) // Cambiado a Cascade
                 .HasConstraintName("FK__Geo__DireccionId__5BE2A6F2");
         });
 

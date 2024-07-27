@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using WebApplication1.Models;
 using WebApplication1.Service;
 
-[ApiController]
-[Route("api/[controller]")]
+//[ApiController]
+//[Route("api/[controller]")]
 public class UsersController : Controller
 {
 	private readonly IApiService _apiService;
@@ -23,9 +21,9 @@ public class UsersController : Controller
 		_context = context;
 	}
 
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
-        //List<Usuario> users = await _context.Usuarios.ToListAsync();
         var users = await _context.Usuarios
             .Include(x => x.Direccion)
             .Include(x => x.Compania)
@@ -67,8 +65,7 @@ public class UsersController : Controller
 
 			if (user.Compania != null)
 			{
-                //user.Compania.UserId = user.Id; // Establecer la relación
-                //user.Compania.User = user;
+
 
                 _context.Compania.Add(user.Compania);
 			}
@@ -80,46 +77,20 @@ public class UsersController : Controller
 		return Ok(users);
     }
 
-    //[HttpPost("api/user/{id}/updateName")]
-    //public IActionResult UpdateName(int id, [FromBody] Usuario user)
-    //{
-    //    if (user == null || id != user.Id)
-    //    {
-    //        return BadRequest();
-    //    }
-
-    //    var existingUser = _context.Usuarios.Find(id);
-    //    if (existingUser == null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    existingUser.Name = user.Name;
-    //    _context.SaveChanges();
-
-    //    return Ok();
-    //}
-
-    [HttpPost("{id}/updateName")]
-    public IActionResult UpdateName(int id, [FromBody] Usuario user)
-    {
-        if (user == null || id != user.Id)
-        {
-            return BadRequest();
-        }
-
-        var existingUser = _context.Usuarios.Find(id);
-        if (existingUser == null)
-        {
-            return NotFound();
-        }
-
-        existingUser.Name = user.Name;
-        _context.SaveChanges();
-
-        return Ok();
+    [HttpGet]
+    public async Task<IActionResult> Editar(int id)
+    { 
+        Usuario usuario = await _context.Usuarios.FirstAsync(x => x.Id == id);
+        return View(usuario);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Editar(Usuario user)
+    {
+        _context.Usuarios.Update(user);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
 
 }
 

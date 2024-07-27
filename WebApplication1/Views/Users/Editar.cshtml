@@ -1,0 +1,34 @@
+﻿@model WebApplication1.Models.Usuario;
+
+<div class="row">
+	<div class="col-sm-8 offset-sm-2">
+		 <h2>Editar Usuario</h2>
+		 <form asp-controller="Users" asp-action="Editar" method="post">
+			 <input asp-for="Id" type="hidden"/>
+			 <div class="mb-3">
+				 <label>Nombre</label>
+				 <input class="form-control" asp-for="Name" type="text"/>
+			 </div>
+			 <div class="mb-3">
+				 <label>Nombre Usuario</label>
+				<input class="form-control" asp-for="Username" type="text" disabled />
+			 </div>
+			 <div class="mb-3">
+				 <label>Correo</label>
+				<input class="form-control" asp-for="Email" type="text" disabled />
+			 </div>
+			<div class="mb-3">
+				<label>Teléfono</label>
+				<input class="form-control" asp-for="Phone" type="text" disabled />
+			</div>
+			<div class="mb-3">
+				<label>Página Web</label>
+				<input class="form-control" asp-for="Website" type="text" disabled />
+			</div>
+			<div class="mb-3">
+				<button class="btn btn-primary" type="submit">Guardar</button>
+				<a asp-controller="Users" asp-action="Index" class="btn btn-warning">Volver</a>
+			</div>
+		 </form>
+	</div>
+</div>

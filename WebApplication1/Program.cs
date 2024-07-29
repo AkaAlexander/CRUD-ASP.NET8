@@ -2,33 +2,37 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 using WebApplication1.Service;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurar el serializador JSON
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
 	options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-	options.JsonSerializerOptions.MaxDepth = 64; // Puedes ajustar la profundidad máxima si es necesario
+	options.JsonSerializerOptions.MaxDepth = 64; 
 });
 
-// Add services to the container.
+// Agrega soporte para controladores con vistas (MVC).
 builder.Services.AddControllersWithViews();
 
-
+// Agrega soporte para controladores API.
 builder.Services.AddControllers();
+
+// Agrega un cliente HTTP para hacer solicitudes HTTP.
 builder.Services.AddHttpClient();
+
+// Agrega el servicio IApiService.
 builder.Services.AddScoped<IApiService, ApiService>();
 
+// Configura el contexto de la base de datos con SQL Server usando la cadena de conexión del archivo de configuración.
 builder.Services.AddDbContext<DbptContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-//Servicio de descarga
+// Agrega el servicio de descarga de usuarios
 builder.Services.AddScoped<UserDownloadService>();
+
+// Agrega el servicio de fondo para ejecutar tareas en segundo plano.
 builder.Services.AddHostedService<BackgroundService>();
 
 
@@ -49,7 +53,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    //pattern: "{controller=Home}/{action=Index}/{id?}");
     pattern: "{controller=Users}/{action=Index}/{id?}");
 
 

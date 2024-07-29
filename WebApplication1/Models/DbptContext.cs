@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication1.Models;
 
@@ -21,12 +19,9 @@ public partial class DbptContext : DbContext
 
     public virtual DbSet<Geo> Geos { get; set; }
 
-    public virtual DbSet<MiTabla> MiTablas { get; set; }
-
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost;Database=DBPT;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -79,15 +74,6 @@ public partial class DbptContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .OnDelete(DeleteBehavior.Cascade) // Cambiado a Cascade
                 .HasConstraintName("FK__Geo__DireccionId__5BE2A6F2");
-        });
-
-        modelBuilder.Entity<MiTabla>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__MiTabla__3214EC07DF386B58");
-
-            entity.ToTable("MiTabla");
-
-            entity.Property(e => e.Valor).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Usuario>(entity =>

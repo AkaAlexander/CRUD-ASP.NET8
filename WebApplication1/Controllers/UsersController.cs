@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 using WebApplication1.Service;
 
-//[ApiController]
-//[Route("api/[controller]")]
+
 public class UsersController : Controller
 {
     private readonly IApiService _apiService;
@@ -14,13 +13,17 @@ public class UsersController : Controller
     /// Constructor
     /// </summary>
     /// <param name="apiService"></param>
-    /// <param name="dbptContext"></param>
+    /// <param name="context"></param>
     public UsersController(IApiService apiService, DbptContext context)
     {
         _apiService = apiService;
         _context = context;
     }
 
+    /// <summary>
+    /// Metodo que devuelve el listado de usuarios
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -36,7 +39,7 @@ public class UsersController : Controller
     /// Para llamar al metodo introducir la url 'https://localhost:44353/api/users/fetch-and-insert'
     /// </summary>
     /// <returns></returns>
-    [HttpGet("fetch-and-insert")]
+    [HttpGet]
     public async Task<IActionResult> FetchAndInsertUsers()
     {
         string apiUrl = "https://jsonplaceholder.typicode.com/users";
@@ -44,7 +47,6 @@ public class UsersController : Controller
 
         foreach (var user in users)
         {
-            //Identifica usuarios con Id
             if (_context.Usuarios.Find(user.Id) == null)
             {
                 _context.Usuarios.Add(user);
@@ -57,26 +59,26 @@ public class UsersController : Controller
 
             if (user.Direccion.Geo != null)
             {
-                //user.Direccion.Geo.DireccionId = user.Direccion.UserId;
-                //user.Direccion.Geo.Direccion = user.Direccion;
 
                 _context.Geos.Add(user.Direccion.Geo);
             }
 
             if (user.Compania != null)
             {
-
-
                 _context.Compania.Add(user.Compania);
             }
         }
 
-        //Añade a la BBDD
         await _context.SaveChangesAsync();
 
         return Ok(users);
     }
 
+    /// <summary>
+    /// Metodo carga la vista con el id del usuario
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>Vista del usuario</returns>
     [HttpGet]
     public async Task<IActionResult> Editar(int id)
     {
@@ -84,6 +86,11 @@ public class UsersController : Controller
         return View(usuario);
     }
 
+    /// <summary>
+    /// Metodo que edita el usuario 
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns>Vista del listado</returns>
     [HttpPost]
     public async Task<IActionResult> Editar(Usuario user)
     {
@@ -92,6 +99,11 @@ public class UsersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    /// <summary>
+    /// Metodo que Elimina un usuario segun id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> Eliminar(int id)
     {
@@ -99,7 +111,6 @@ public class UsersController : Controller
         {
             try
             {
-                // Buscar el usuario
                 var user = await _context.Usuarios
                     .Include(u => u.Direccion)
                     .ThenInclude(d => d.Geo)
@@ -111,20 +122,18 @@ public class UsersController : Controller
                     return NotFound();
                 }
 
-                // Eliminar el usuario (esto también eliminará Direccion, Geo y Compania por la configuración de borrado en cascada)
                 _context.Usuarios.Remove(user);
                 await _context.SaveChangesAsync();
 
-                // Confirmar la transacción
                 await transaction.CommitAsync();
 
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception)
             {
-                // Revertir la transacción en caso de error
                 await transaction.RollbackAsync();
-                return StatusCode(500, "Internal server error");
+                TempData["ErrorMessage"] = "Ocurrió un error al intentar eliminar el usuario.";
+                return RedirectToAction(nameof(Index));
             }
         }
     }
